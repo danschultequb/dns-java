@@ -2,6 +2,19 @@ package qub;
 
 public interface DNSTests
 {
+    static void test(TestRunner runner)
+    {
+        runner.testGroup(DNS.class, () ->
+        {
+            runner.test("create()", (Test test) ->
+            {
+                final DNS dns = DNS.create();
+                test.assertNotNull(dns);
+                test.assertInstanceOf(dns, JavaDNS.class);
+            });
+        });
+    }
+
     static void test(TestRunner runner, Function0<DNS> creator)
     {
         runner.testGroup(DNS.class, () ->

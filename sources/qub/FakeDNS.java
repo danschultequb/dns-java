@@ -2,22 +2,25 @@ package qub;
 
 public class FakeDNS implements DNS
 {
-    private final MutableMap<String,IPv4Address> hostToIPAddressMap = Map.create();
+    private final MutableMap<String,IPv4Address> hostToIPAddressMap;
 
-    public Result<Void> set(String host, IPv4Address ipAddress)
+    private FakeDNS()
+    {
+        this.hostToIPAddressMap = Map.create();
+    }
+
+    public static FakeDNS create()
+    {
+        return new FakeDNS();
+    }
+
+    public FakeDNS set(String host, IPv4Address ipAddress)
     {
         PreCondition.assertNotNullAndNotEmpty(host, "host");
         PreCondition.assertNotNull(ipAddress, "ipAddress");
 
         hostToIPAddressMap.set(host, ipAddress);
-        return Result.success();
-    }
-
-    public Result<IPv4Address> remove(String host)
-    {
-        PreCondition.assertNotNullAndNotEmpty(host, "host");
-
-        return hostToIPAddressMap.remove(host);
+        return this;
     }
 
     @Override
