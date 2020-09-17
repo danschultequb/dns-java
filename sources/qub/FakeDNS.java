@@ -28,20 +28,16 @@ public class FakeDNS implements DNS
     {
         PreCondition.assertNotNullAndNotEmpty(host, "host");
 
-        Result<IPv4Address> result;
-        final IPv4Address hostAsIpAddress = IPv4Address.parse(host);
-        if (hostAsIpAddress != null)
+        return Result.create(() ->
         {
-            result = Result.success(hostAsIpAddress);
-        }
-        else if (!hostToIPAddressMap.containsKey(host))
-        {
-            result = Result.error(new java.net.UnknownHostException(host));
-        }
-        else
-        {
-            result = hostToIPAddressMap.get(host);
-        }
-        return result;
+            IPv4Address result = IPv4Address.parse(host);
+            if (result == null)
+            {
+                result = hostToIPAddressMap.get(host)
+                    .convertError(NotFoundException.class, () -> new java.net.UnknownHostException("No such host is known (" + host + ")"))
+                    .await();
+            }
+            return result;
+        });
     }
 }

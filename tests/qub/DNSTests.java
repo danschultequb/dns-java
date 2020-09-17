@@ -21,68 +21,35 @@ public interface DNSTests
         {
             runner.testGroup("resolveHost(String)", () ->
             {
-                runner.test("with null", (Test test) ->
+                final Action2<String,Throwable> resolveHostErrorTest = (String host, Throwable expected) ->
                 {
-                    final DNS dns = creator.run();
-                    test.assertThrows(() -> dns.resolveHost(null),
-                        new PreConditionFailure("host cannot be null."));
-                });
+                    runner.test("with " + Strings.escapeAndQuote(host), (Test test) ->
+                    {
+                        final DNS dns = creator.run();
+                        test.assertThrows(() -> dns.resolveHost(host).await(),
+                            expected);
+                    });
+                };
 
-                runner.test("with empty", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    test.assertThrows(() -> dns.resolveHost(""),
-                        new PreConditionFailure("host cannot be empty."));
-                });
+                resolveHostErrorTest.run(null, new PreConditionFailure("host cannot be null."));
+                resolveHostErrorTest.run("", new PreConditionFailure("host cannot be empty."));
+                resolveHostErrorTest.run("spam.example.com", new java.net.UnknownHostException("No such host is known (spam.example.com)"));
+                resolveHostErrorTest.run("com", new java.net.UnknownHostException("No such host is known (com)"));
+                resolveHostErrorTest.run("www.notavalidwebpageurlidontexist.com", new java.net.UnknownHostException("No such host is known (www.notavalidwebpageurlidontexist.com)"));
 
-                runner.test("with \"1.2.3.4\"", (Test test) ->
+                final Action2<String,IPv4Address> resolveHostTest = (String host, IPv4Address expected) ->
                 {
-                    final DNS dns = creator.run();
-                    test.assertEqual(IPv4Address.parse("1.2.3.4"), dns.resolveHost("1.2.3.4").await());
-                });
+                    runner.test("with " + Strings.escapeAndQuote(host), (Test test) ->
+                    {
+                        final DNS dns = creator.run();
+                        test.assertEqual(expected, dns.resolveHost(host).await());
+                    });
+                };
 
-                runner.test("with \"www.example.com\"", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    test.assertEqual(IPv4Address.parse("93.184.216.34"), dns.resolveHost("www.example.com").await());
-                });
-
-                runner.test("with \"spam.example.com\"", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    test.assertThrows(() -> dns.resolveHost("spam.example.com").await(),
-                        new RuntimeException(new java.net.UnknownHostException("spam.example.com")));
-                });
-
-                runner.test("with \"example.com\"", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    test.assertEqual(IPv4Address.parse("93.184.216.34"), dns.resolveHost("example.com").await());
-                });
-
-                runner.test("with \"com\"", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    test.assertThrows(() -> dns.resolveHost("com").await(),
-                        new RuntimeException(new java.net.UnknownHostException("com")));
-                });
-
-                runner.test("with \"www.notavalidwebpageurlidontexist.com\"", (Test test) ->
-                {
-                    final DNS dns = creator.run();
-                    dns.resolveHost("www.notavalidwebpageurlidontexist.com")
-                        .then((IPv4Address resolvedAddress) ->
-                        {
-                            // Some internet service providers detect a failed DNS query and will redirect the query to
-                            // a web search instead.
-                            test.assertNull(resolvedAddress);
-                        })
-                        .catchError(java.net.UnknownHostException.class, (java.net.UnknownHostException error) ->
-                        {
-                            test.assertEqual("www.notavalidwebpageurlidontexist.com", error.getMessage());
-                        })
-                        .await();
-                });
+                resolveHostTest.run("1.2.3.4", IPv4Address.parse("1.2.3.4"));
+                resolveHostTest.run("www.example.com", IPv4Address.parse("93.184.216.34"));
+                resolveHostTest.run("example.com", IPv4Address.parse("93.184.216.34"));
+                resolveHostTest.run("missie", IPv4Address.parse("192.168.0.127"));
             });
         });
     }
