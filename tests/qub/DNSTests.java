@@ -33,9 +33,9 @@ public interface DNSTests
 
                 resolveHostErrorTest.run(null, new PreConditionFailure("host cannot be null."));
                 resolveHostErrorTest.run("", new PreConditionFailure("host cannot be empty."));
-                resolveHostErrorTest.run("spam.example.com", new java.net.UnknownHostException("No such host is known (spam.example.com)"));
-                resolveHostErrorTest.run("com", new java.net.UnknownHostException("No such host is known (com)"));
-                resolveHostErrorTest.run("www.notavalidwebpageurlidontexist.com", new java.net.UnknownHostException("No such host is known (www.notavalidwebpageurlidontexist.com)"));
+                resolveHostErrorTest.run("spam.example.com", new HostNotFoundException("spam.example.com"));
+                resolveHostErrorTest.run("com", new HostNotFoundException("com"));
+                resolveHostErrorTest.run("www.notavalidwebpageurlidontexist.com", new HostNotFoundException("www.notavalidwebpageurlidontexist.com"));
 
                 final Action2<String,IPv4Address> resolveHostTest = (String host, IPv4Address expected) ->
                 {

@@ -34,7 +34,7 @@ public class FakeDNS implements DNS
             if (result == null)
             {
                 result = hostToIPAddressMap.get(host)
-                    .convertError(NotFoundException.class, () -> new java.net.UnknownHostException("No such host is known (" + host + ")"))
+                    .convertError(NotFoundException.class, () -> new HostNotFoundException(host))
                     .await();
             }
             return result;

@@ -32,7 +32,7 @@ public class JavaDNS implements DNS
             }
             catch (java.net.UnknownHostException e)
             {
-                throw Exceptions.asRuntime(e);
+                throw new HostNotFoundException(host);
             }
             return result;
         });
