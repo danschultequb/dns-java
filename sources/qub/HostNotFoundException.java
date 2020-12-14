@@ -14,13 +14,6 @@ public class HostNotFoundException extends NotFoundException
         this.host = host;
     }
 
-    public HostNotFoundException(String host, Throwable innerException)
-    {
-        super(HostNotFoundException.getMessage(host), innerException);
-
-        this.host = host;
-    }
-
     private static String getMessage(String host)
     {
         PreCondition.assertNotNullAndNotEmpty(host, "host");

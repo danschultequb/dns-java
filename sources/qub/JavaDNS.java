@@ -28,7 +28,7 @@ public class JavaDNS implements DNS
                 String inetAddressString = inetAddress.toString();
                 final int forwardSlashIndex = inetAddressString.indexOf('/');
                 inetAddressString = inetAddressString.substring(forwardSlashIndex + 1);
-                result = IPv4Address.parse(inetAddressString);
+                result = IPv4Address.parse(inetAddressString).await();
             }
             catch (java.net.UnknownHostException e)
             {

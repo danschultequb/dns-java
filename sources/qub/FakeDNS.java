@@ -28,16 +28,12 @@ public class FakeDNS implements DNS
     {
         PreCondition.assertNotNullAndNotEmpty(host, "host");
 
-        return Result.create(() ->
-        {
-            IPv4Address result = IPv4Address.parse(host);
-            if (result == null)
+        return IPv4Address.parse(host)
+            .catchError(ParseException.class, () ->
             {
-                result = hostToIPAddressMap.get(host)
+                return hostToIPAddressMap.get(host)
                     .convertError(NotFoundException.class, () -> new HostNotFoundException(host))
                     .await();
-            }
-            return result;
-        });
+            });
     }
 }
