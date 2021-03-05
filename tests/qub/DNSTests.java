@@ -49,7 +49,6 @@ public interface DNSTests
                 resolveHostTest.run("1.2.3.4", IPv4Address.parse("1.2.3.4").await());
                 resolveHostTest.run("www.example.com", IPv4Address.parse("93.184.216.34").await());
                 resolveHostTest.run("example.com", IPv4Address.parse("93.184.216.34").await());
-                resolveHostTest.run("missie", IPv4Address.parse("192.168.0.175").await());
             });
         });
     }
